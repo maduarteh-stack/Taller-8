@@ -1,0 +1,520 @@
+---
+title: "Taller 8 - Fundamentos GEE"
+author: "María José Duarte Hamón"
+format:
+  html:
+    toc: true
+  pdf:
+    toc: true
+---
+
+# Entregables
+
+Para este taller se adjunta en este documento:
+
+ * Los códigos utilizados para las actividades necesarias
+ * Imágenes de los mapas realizados en QGIS con la exportación de JSON
+ * Debido a inconvenientes para renderizar el documento se colocan los textos o las imágenes de los resultados
+
+
+Al repositorio se añaden los mapas interactivos realizados en HTML, para descargar y probar.
+
+# Integración de geoprocesos en plataformas de escritorio
+
+## Inicialización
+
+```{python}
+#| error: true
+import ee
+ee.Authenticate()
+```
+
+```{python}
+#| error: true
+ee.Initialize(project="maduarteh-taller8")
+print("Google Earth Engine se ha inicializado con éxito!")
+```
+
+```{python}
+#| eval: false
+# 1. IMPORTACIÓN E INICIALIZACIÓN
+# 'ee' es la librería central para interactuar con los servidores de Google.
+import ee
+import geemap
+import json
+
+# 2. VARIABLES EN EL ENTORNO CLIENTE (PYTHON NATIVO)
+# Estas variables residen exclusivamente en la memoria de la computadora local.
+ciudad_cliente = 'Bogotá'
+poblacion_cliente = 7181469
+ciudades_cliente = ['Bogotá', 'Medellín', 'Cali', 'Barranquilla']
+
+datos_ciudad_cliente = {
+    'ciudad': 'Bogotá',
+    'coordenadas': [-74.084, 4.638],
+    'poblacion': 7181469
+}
+
+# 3. VARIABLES EN EL ENTORNO SERVIDOR (OBJETOS EARTH ENGINE)
+# Estas variables se declaran como contenedores de instrucciones para la nube.
+# Los datos reales no existen en la memoria local hasta que se solicitan.
+ciudad_servidor = ee.String('Bogotá')
+poblacion_servidor = ee.Number(7181469)
+coordenadas_servidor = ee.List([-74.084, 4.638])
+ciudades_servidor = ee.List(['Bogotá', 'Medellín', 'Cali', 'Barranquilla'])
+
+datos_ciudad_servidor = ee.Dictionary({
+    'ciudad': ciudad_servidor,
+    'coordenadas': coordenadas_servidor,
+    'poblacion': poblacion_servidor
+})
+
+# Alternativamente:
+# El constructor ee.Dictionary() de la API de Google Earth Engine es capaz
+# de "envolver" (hacer casting) automáticamente tipos de datos nativos
+# de Python (como strings o números) a objetos del servidor
+datos_ciudad_servidor = ee.Dictionary({
+    'ciudad': 'Bogotá',
+    'coordenadas': [-74.084, 4.638],
+    'poblacion': 7181469
+})
+
+# 4. FUNCIONES DEL SERVIDOR
+# Las concatenaciones y operaciones de texto requieren métodos de la API (ej. .cat).
+# Definimos la función en Python que devuelve un objeto de Earth Engine (instrucción).
+def saludar_servidor(nombre):
+    return ee.String('Hola ').cat(nombre)
+
+# Ejecutamos la función pasándole un nombre.
+# El resultado es un objeto ee.String que vive en el servidor.
+saludo_unal = saludar_servidor('Comunidad UNAL')
+
+# 5. OPERACIONES EN EL SERVIDOR
+# Las operaciones matemáticas no utilizan operadores nativos (+, -, *, /).
+# Se deben emplear los métodos específicos de las clases de Earth Engine.
+valor_a = 1
+valor_b = 2
+resultado_suma = ee.Number(valor_a).add(valor_b)
+
+# Generación de secuencias numéricas (ej. años para series de tiempo).
+# La secuencia incluye el 2020!
+lista_anios = ee.List.sequence(1980, 2020, 5)
+
+# 6. TRANSFERENCIA SERVIDOR -> CLIENTE (.getInfo())
+# Para visualizar o utilizar los resultados procesados en la nube dentro del entorno local,
+# es estrictamente obligatorio invocar el método .getInfo().
+print("--- RESULTADOS TRANSFERIDOS DESDE EL SERVIDOR ---")
+print("Saludo del servidor:", saludo_unal.getInfo())
+print("Ciudad:", ciudad_servidor.getInfo())
+print("Resultado suma:", resultado_suma.getInfo())
+print("Secuencia de años:", lista_anios.getInfo())
+print("Datos de la ciudad:", datos_ciudad_servidor.getInfo())
+```
+
+:::{.callout-note}
+--- RESULTADOS TRANSFERIDOS DESDE EL SERVIDOR ---
+Saludo del servidor: Hola Comunidad UNAL
+Ciudad: Bogotá
+Resultado suma: 3
+Secuencia de años: [1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020]
+Datos de la ciudad: {'ciudad': 'Bogotá', 'coordenadas': [-74.084, 4.638], 'poblacion': 7181469}
+:::
+
+## Geoprocesos seleccionados
+
+ * **Reducción Estadística Temporal:** Utilizando la colección de Sentinel-2 para crear una imagen sintética limpia de nubes mediante el cálculo de la mediana de los píxeles.
+
+ * **Álgebra de Bandas (Cálculo del Índice de Vegetación NDVI):** Aplicando la diferencia normalizada sobre las bandas del Infrarrojo Cercano (NIR) y Rojo de una imagen Sentinel-2.
+
+### Mosaico Mediano Temporal
+
+Este bloque filtra la colección armonizada de Sentinel-2 sobre un punto de interés (en este ejemplo, el Eje Cafetero), calcula la mediana para remover nubes y exporta el grafo computacional serializado en formato JSON.
+
+```{python}
+#| eval: false
+#| label: geoproceso-mosaico-mediano
+# Geoproceso 1 - Mosaico Mediano Temporal (Sentinel-2)
+import ee
+import json
+import os
+
+# Asegurar que exista la carpeta 'data' en el directorio local
+os.makedirs('data', exist_ok=True)
+
+# Definición de un punto de interés geográfico (Eje Cafetero / Pereira)
+punto_eje = ee.Geometry.Point([-75.696, 4.813])
+
+# 1. Consulta y filtrado espacial, temporal y de calidad (nubosidad < 15%)
+coleccion_s2 = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+                .filterBounds(punto_eje)
+                .filterDate('2024-01-01', '2024-12-31')
+                .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 15)))
+
+# 2. Aplicación de la reducción estadística temporal por mediana
+mosaico_mediano = coleccion_s2.median()
+
+# Seleccionamos las bandas de Color Verdadero (R=B4, G=B3, B=B2) para la visualización en SIG
+mosaico_rgb = mosaico_mediano.select(['B4', 'B3', 'B2'])
+
+# 3. Serialización del objeto estructurado y exportación a JSON
+mosaico_serializado = mosaico_rgb.serialize()
+
+with open('data/geoproceso1_mosaico_serializado.json', 'w') as archivo:
+    json.dump(mosaico_serializado, archivo)
+
+print("Geoproceso 1 completado. Archivo guardado en 'data/geoproceso1_mosaico_serializado.json'")
+```
+
+::: {.callout-note}
+Geoproceso 1 completado. Archivo guardado en 'data/geoproceso1_mosaico_serializado.json'
+:::
+
+
+### Álgebra de bandas
+
+Este bloque selecciona una imagen individual limpia de Sentinel-2 en el Valle del Cauca, ejecuta la operación matemática del índice NDVI empleando el método `.normalizedDifference()` y exporta el resultado serializado.
+
+```{python}
+#| eval: false
+#| label: geoproceso-calculo-ndvi
+# Geoproceso 2 - Álgebra de Bandas (Cálculo de NDVI)
+import ee
+import json
+
+# Definición de un punto de interés geográfico (Zarzal, Valle del Cauca)
+punto_valle = ee.Geometry.Point([-76.052, 4.398])
+
+# 1. Selección de una imagen individual con baja presencia de nubes
+img_s2 = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+          .filterBounds(punto_valle)
+          .filterDate('2023-01-01', '2023-12-31')
+          .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 10))
+          .first())
+
+# 2. Álgebra de bandas: Cálculo del NDVI utilizando las bandas B8 (NIR) y B4 (Rojo)
+# Fórmula automatizada por GEE: (B8 - B4) / (B8 + B4)
+ndvi = img_s2.normalizedDifference(['B8', 'B4']).rename('NDVI')
+
+# 3. Serialización del objeto de índice de vegetación y exportación a JSON
+ndvi_serializado = ndvi.serialize()
+
+with open('data/geoproceso2_ndvi_serializado.json', 'w') as archivo:
+    json.dump(ndvi_serializado, archivo)
+
+print("Geoproceso 2 completado. Archivo guardado en 'data/geoproceso2_ndvi_serializado.json'")
+```
+
+::: {.callout-note}
+Geoproceso 2 completado. Archivo guardado en 'data/geoproceso2_ndvi_serializado.json'
+:::
+
+### Mapas estáticos de los geoprocesos realizados
+
+```{python}
+#| eval: false
+#| label: fig-mapa-mosaico
+#| fig-cap: "Mapa estático del Mosaico Mediano Temporal (Sentinel-2) en Color Verdadero."
+#| warning: false
+#| message: false
+
+import requests
+import matplotlib.pyplot as plt
+from PIL import Image
+from io import BytesIO
+
+# 1. Definir un área de cobertura (Buffer de 25 km) alrededor del punto del Eje Cafetero
+roi_mosaico = punto_eje.buffer(25000)
+
+# 2. Convertir los datos numéricos a formato RGB visible (Escala típica S2 SR: 0 a 3000)
+mosaico_vis = mosaico_rgb.visualize(min=0, max=3000)
+
+# 3. Solicitar la URL de la miniatura al servidor de Google Earth Engine
+url_mosaico = mosaico_vis.getThumbURL({
+    'dimensions': 800,  # Resolución en píxeles
+    'region': roi_mosaico,
+    'format': 'png'
+})
+
+# 4. Descargar la imagen temporalmente a la memoria local
+respuesta_m = requests.get(url_mosaico)
+img_mosaico = Image.open(BytesIO(respuesta_m.content))
+
+# 5. Obtener coordenadas geográficas reales para el encuadre (Bounding Box)
+coords_m = roi_mosaico.bounds().getInfo()['coordinates'][0]
+xmin_m, ymin_m = coords_m[0][0], coords_m[0][1]
+xmax_m, ymax_m = coords_m[2][0], coords_m[2][1]
+
+# 6. Dibujar el mapa estático con Matplotlib
+fig, ax = plt.subplots(figsize=(7, 7))
+ax.imshow(img_mosaico, extent=[xmin_m, xmax_m, ymin_m, ymax_m])
+
+# Estética cartográfica básica
+ax.grid(color='white', linestyle='--', linewidth=0.5, alpha=0.6)
+ax.set_title('Mosaico Mediano Temporal - Sentinel-2', fontsize=12, fontweight='bold')
+ax.set_xlabel('Longitud (Grados Decimales)')
+ax.set_ylabel('Latitud (Grados Decimales)')
+
+plt.tight_layout()
+plt.show()
+```
+
+![Mosaico Mediano Temporal - Sentinel](mosaico.png)
+
+
+```{python}
+#| eval: false
+#| label: fig-mapa-ndvi
+#| fig-cap: "Mapa estático del Índice de Vegetación de Diferencia Normalizada (NDVI) en el Valle del Cauca."
+#| warning: false
+#| message: false
+
+# 1. Definir un área de cobertura (Buffer de 20 km) alrededor del punto del Valle
+roi_ndvi = punto_valle.buffer(20000)
+
+# 2. Definir paleta de colores para el NDVI (Suelo desnudo a vegetación densa)
+paleta_ndvi = ['#FFFFFF', '#CE7E3B', '#E6A20B', '#E5D60B', '#AADE0B', '#32CD32', '#006400']
+
+# 3. Convertir el mapa de NDVI a RGB usando la paleta y rangos
+ndvi_vis = ndvi.visualize(min=0.0, max=0.8, palette=paleta_ndvi)
+
+# 4. Solicitar la URL de la miniatura a GEE
+url_ndvi = ndvi_vis.getThumbURL({
+    'dimensions': 800,
+    'region': roi_ndvi,
+    'format': 'png'
+})
+
+# 5. Descargar la imagen en la memoria
+respuesta_n = requests.get(url_ndvi)
+img_ndvi = Image.open(BytesIO(respuesta_n.content))
+
+# 6. Obtener coordenadas geográficas para el encuadre
+coords_n = roi_ndvi.bounds().getInfo()['coordinates'][0]
+xmin_n, ymin_n = coords_n[0][0], coords_n[0][1]
+xmax_n, ymax_n = coords_n[2][0], coords_n[2][1]
+
+# 7. Dibujar el mapa estático con Matplotlib
+fig, ax = plt.subplots(figsize=(7, 7))
+ax.imshow(img_ndvi, extent=[xmin_n, xmax_n, ymin_n, ymax_n])
+
+# Estética cartográfica básica
+ax.grid(color='black', linestyle='--', linewidth=0.5, alpha=0.3)
+ax.set_title('Índice de Vegetación (NDVI) - Sentinel-2', fontsize=12, fontweight='bold')
+ax.set_xlabel('Longitud (Grados Decimales)')
+ax.set_ylabel('Latitud (Grados Decimales)')
+
+plt.tight_layout()
+plt.show()
+```
+
+![NDVI - Sentinel 2](NDVI.png)
+
+## Imágenes de las composiciones realizadas 
+
+Se importaron estas imágenes a ARCGIS con el objetivo de elaborar mapas a partir de estos. Sin embargo, no fue posible realizar la instalación de la librería de GEE en arcgis por lo que se exporta el mapa TIFF para realizar el ejercicio 
+
+**Mosaico**
+
+```{python}
+#| eval: false
+import requests
+
+roi_descarga_1 = punto_eje.buffer(12000)  # antes 25000, ahora 12 km de radio
+
+url_descarga_1 = mosaico_rgb.getDownloadURL({
+    'scale': 30,  # antes 10, ahora 30 metros por píxel
+    'region': roi_descarga_1,
+    'format': 'GEO_TIFF'
+})
+
+respuesta_1 = requests.get(url_descarga_1)
+with open('data/geoproceso1_mosaico.tif', 'wb') as f:
+    f.write(respuesta_1.content)
+
+print("GeoTIFF del geoproceso 1 descargado correctamente")
+```
+
+```{python}
+#| eval: false
+
+roi_descarga_2 = punto_valle.buffer(10000)  # antes 20000, ahora 10 km de radio
+
+url_descarga_2 = ndvi.getDownloadURL({
+    'scale': 20,  # antes 10, ahora 20 metros por píxel
+    'region': roi_descarga_2,
+    'format': 'GEO_TIFF'
+})
+
+respuesta_2 = requests.get(url_descarga_2)
+with open('data/geoproceso2_ndvi.tif', 'wb') as f:
+    f.write(respuesta_2.content)
+
+print("GeoTIFF del geoproceso 2 descargado correctamente")
+```
+
+Confirmamos el sistema de coordenadas que tienen las imágenes para hacer el mapa
+```{python}
+#| eval: false
+
+import rasterio
+
+with rasterio.open('data/geoproceso1_mosaico.tif') as src:
+    print("CRS del geoproceso 1:", src.crs)
+
+with rasterio.open('data/geoproceso2_ndvi.tif') as src:
+    print("CRS del geoproceso 2:", src.crs)
+```
+
+::: {.callout-note}
+CRS del geoproceso 1: EPSG:4326
+CRS del geoproceso 2: EPSG:32618
+:::
+
+IMAGENES DE LOS MAPAS 
+![Mosaico](mosaico.jpg)
+
+![NDVI](NDVI.jpg)
+
+
+# Reto programación espacial avanzada
+
+## Análisis multiespectral extendido
+
+Se construye un mapa interactivo que integra cuatro composiciones espectrales derivadas de un único mosaico mediano de Sentinel-2 sobre el Eje Cafetero: color natural, falso color infrarrojo, NDVI y NDWI, cada una como una capa independiente controlable desde Folium.
+
+```{python}
+#| eval: false
+import ee
+
+# Punto de interés: Eje Cafetero (Pereira)
+punto_eje = ee.Geometry.Point([-75.696, 4.813])
+
+# Colección Sentinel-2 filtrada por espacio, tiempo y nubosidad
+coleccion_s2 = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+                .filterBounds(punto_eje)
+                .filterDate('2024-01-01', '2024-12-31')
+                .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 15)))
+
+# Mosaico mediano (imagen compuesta libre de nubes)
+mosaico = coleccion_s2.median()
+
+print("Bandas disponibles:", mosaico.bandNames().getInfo())
+```
+
+```{python}
+#| eval: false
+# NDVI = (NIR - Rojo) / (NIR + Rojo)  ->  detecta vegetación sana
+ndvi_reto = mosaico.normalizedDifference(['B8', 'B4']).rename('NDVI')
+
+# NDWI = (Verde - NIR) / (Verde + NIR)  ->  detecta agua/humedad
+ndwi_reto = mosaico.normalizedDifference(['B3', 'B8']).rename('NDWI')
+
+print("NDVI y NDWI calculados correctamente")
+```
+
+```{python}
+#| eval: false
+# Color natural (RGB verdadero)
+vis_natural = {'bands': ['B4', 'B3', 'B2'], 'min': 0, 'max': 3000}
+
+# Falso color infrarrojo (para contexto, opcional)
+vis_falso_color = {'bands': ['B8', 'B4', 'B3'], 'min': 0, 'max': 3000}
+
+# NDVI: paleta de rojo (poca vegetación) a verde (mucha vegetación)
+vis_ndvi = {
+    'min': -0.2,
+    'max': 0.8,
+    'palette': ['red', 'orange', 'yellow', 'lightgreen', 'darkgreen']
+}
+
+# NDWI: paleta de café (seco) a azul (agua)
+vis_ndwi = {
+    'min': -0.5,
+    'max': 0.5,
+    'palette': ['brown', 'white', 'blue']
+}
+```
+
+```{python}
+#| eval: false
+id_natural = mosaico.getMapId(vis_natural)
+id_falso_color = mosaico.getMapId(vis_falso_color)
+id_ndvi = ndvi_reto.getMapId(vis_ndvi)
+id_ndwi = ndwi_reto.getMapId(vis_ndwi)
+
+print("IDs de mapa generados para las 4 capas")
+```
+
+```{python}
+#| eval: false
+#| output: false
+import os
+import folium
+
+os.makedirs('mapas', exist_ok=True)
+
+# Mapa base centrado en el Eje Cafetero
+Map_multiespectral = folium.Map(location=[4.813, -75.696], zoom_start=11)
+
+# Capa 1: Color natural (encendida por defecto)
+folium.TileLayer(
+    tiles=id_natural['tile_fetcher'].url_format,
+    attr='Google Earth Engine',
+    overlay=True,
+    name='1. Color Natural (RGB)',
+    show=True
+).add_to(Map_multiespectral)
+
+# Capa 2: Falso color infrarrojo (apagada por defecto)
+folium.TileLayer(
+    tiles=id_falso_color['tile_fetcher'].url_format,
+    attr='Google Earth Engine',
+    overlay=True,
+    name='2. Falso Color Infrarrojo',
+    show=False
+).add_to(Map_multiespectral)
+
+# Capa 3: NDVI (apagada por defecto)
+folium.TileLayer(
+    tiles=id_ndvi['tile_fetcher'].url_format,
+    attr='Google Earth Engine',
+    overlay=True,
+    name='3. NDVI (Vegetación)',
+    show=False
+).add_to(Map_multiespectral)
+
+# Capa 4: NDWI (apagada por defecto)
+folium.TileLayer(
+    tiles=id_ndwi['tile_fetcher'].url_format,
+    attr='Google Earth Engine',
+    overlay=True,
+    name='4. NDWI (Agua/Humedad)',
+    show=False
+).add_to(Map_multiespectral)
+
+# Control de capas: permite prender/apagar cada una desde el mapa
+folium.LayerControl(collapsed=False).add_to(Map_multiespectral)
+
+# Guardar el mapa como HTML independiente (queda disponible en el repositorio)
+Map_multiespectral.save("mapas/map_multiespectral.html")
+```
+
+El mapa interactivo con las cuatro capas (color natural, falso color infrarrojo, NDVI y NDWI) se genera y se guarda como archivo HTML independiente en `mapas/map_multiespectral.html`. 
+No se coloca interactivo dentro de este documento, para garantizar una renderización estable tanto en HTML como en PDF. El archivo se encuentra adjunto en el repositorio de GitHub del taller y puede abrirse directamente en cualquier navegador:
+
+![Mapa Multiespectral](mapa%20multiespectral.png)
+
+
+# Preguntas Finales
+
+## Arquitectura cliente-servidor
+
+La API de Google Earth Engine (GEE) opera bajo una arquitectura distribuida donde existen dos entornos independientes. El cliente corresponde a la máquina local y sus variables de Python, las cuales se ejecutan de forma inmediata. Por el contrario, el servidor abarca la infraestructura en la nube de Google que almacena y procesa datos satelitales. Los objetos como `ee.Image` o `ee.Number` no contienen datos reales locales, estos funcionan como nodos de un grafo de instrucciones. Debido a esto, las operaciones matemáticas nativas de Python son incompatibles con la API, requiriendo métodos específicos, como `.add()` o `.select()`, para estructurar los procesos que los servidores de Google ejecutarán en paralelo sin sobrecargar el computador.
+
+Para comunicar ambos entornos, el método `.getInfo()` cumple la función de forzar la evaluación asíncrona del grafo en el servidor para descargar un resultado numérico o de metadatos simplificado hacia la memoria RAM local. No obstante, al procesar volúmenes masivos sobre regiones extensas como el territorio colombiano, la transferencia de imágenes completas a través de este método saturaría el canal de respuesta; por ello, para la visualización fluida o el almacenamiento de datos a gran escala, se delega el flujo de trabajo a herramientas optimizadas de despliegue interactivo o rutinas asíncronas de exportación en lote.
+
+## Firmas espectrales y comportamiento radiométrico
+
+La resolución espectral determina la capacidad de un sensor para discriminar coberturas terrestres que son visualmente parecidas pero muestran comportamientos radiométricos opuestos en regiones invisibles al ojo humano. Esta divergencia se muestra al contrastar un cuerpo de agua, como el Embalse de Tominé, con un bosque altoandino en la región del infrarrojo cercano. Mientras que la vegetación sana dispersa la energía generando picos de reflectancia que superan el 40%, el agua absorbe casi la totalidad de los fotones, reduciendo su reflectancia a niveles cercanos a cero. Esta diferencia constituye el fundamento físico y matemático para el cálculo de índices de vegetación.
+
+En el infrarrojo de onda corta (SWIR), la vegetación experimenta un descenso moderado debido a su contenido de humedad foliar, mientras que el agua mantiene la absorción y una curva cercana a cero. Por esto, el bosque altoandino dibuja una curva con un pico marcado en el NIR y un descenso pequeño en el SWIR, en contraste con la trayectoria lineal y de baja reflectancia del embalse al ser un cuerpo hídrico. Esta diferencia en el patrón espectral permite a los algoritmos de clasificación asignar etiquetas de cobertura a cada píxel.

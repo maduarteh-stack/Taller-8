@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="María José Duarte Hamón">
+
+<title>Taller 8 - Fundamentos GEE</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="taller8 (1)_files/libs/clipboard/clipboard.min.js"></script>
+<script src="taller8 (1)_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="taller8 (1)_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="taller8 (1)_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="taller8 (1)_files/libs/quarto-html/popper.min.js"></script>
+<script src="taller8 (1)_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="taller8 (1)_files/libs/quarto-html/anchor.min.js"></script>
+<link href="taller8 (1)_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="taller8 (1)_files/libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="taller8 (1)_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="taller8 (1)_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="taller8 (1)_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#entregables" id="toc-entregables" class="nav-link active" data-scroll-target="#entregables">Entregables</a></li>
+  <li><a href="#integración-de-geoprocesos-en-plataformas-de-escritorio" id="toc-integración-de-geoprocesos-en-plataformas-de-escritorio" class="nav-link" data-scroll-target="#integración-de-geoprocesos-en-plataformas-de-escritorio">Integración de geoprocesos en plataformas de escritorio</a>
+  <ul class="collapse">
+  <li><a href="#inicialización" id="toc-inicialización" class="nav-link" data-scroll-target="#inicialización">Inicialización</a></li>
+  <li><a href="#geoprocesos-seleccionados" id="toc-geoprocesos-seleccionados" class="nav-link" data-scroll-target="#geoprocesos-seleccionados">Geoprocesos seleccionados</a>
+  <ul class="collapse">
+  <li><a href="#mosaico-mediano-temporal" id="toc-mosaico-mediano-temporal" class="nav-link" data-scroll-target="#mosaico-mediano-temporal">Mosaico Mediano Temporal</a></li>
+  <li><a href="#álgebra-de-bandas" id="toc-álgebra-de-bandas" class="nav-link" data-scroll-target="#álgebra-de-bandas">Álgebra de bandas</a></li>
+  <li><a href="#mapas-estáticos-de-los-geoprocesos-realizados" id="toc-mapas-estáticos-de-los-geoprocesos-realizados" class="nav-link" data-scroll-target="#mapas-estáticos-de-los-geoprocesos-realizados">Mapas estáticos de los geoprocesos realizados</a></li>
+  </ul></li>
+  <li><a href="#imágenes-de-las-composiciones-realizadas" id="toc-imágenes-de-las-composiciones-realizadas" class="nav-link" data-scroll-target="#imágenes-de-las-composiciones-realizadas">Imágenes de las composiciones realizadas</a></li>
+  </ul></li>
+  <li><a href="#reto-programación-espacial-avanzada" id="toc-reto-programación-espacial-avanzada" class="nav-link" data-scroll-target="#reto-programación-espacial-avanzada">Reto programación espacial avanzada</a>
+  <ul class="collapse">
+  <li><a href="#análisis-multiespectral-extendido" id="toc-análisis-multiespectral-extendido" class="nav-link" data-scroll-target="#análisis-multiespectral-extendido">Análisis multiespectral extendido</a></li>
+  </ul></li>
+  <li><a href="#preguntas-finales" id="toc-preguntas-finales" class="nav-link" data-scroll-target="#preguntas-finales">Preguntas Finales</a>
+  <ul class="collapse">
+  <li><a href="#arquitectura-cliente-servidor" id="toc-arquitectura-cliente-servidor" class="nav-link" data-scroll-target="#arquitectura-cliente-servidor">Arquitectura cliente-servidor</a></li>
+  <li><a href="#firmas-espectrales-y-comportamiento-radiométrico" id="toc-firmas-espectrales-y-comportamiento-radiométrico" class="nav-link" data-scroll-target="#firmas-espectrales-y-comportamiento-radiométrico">Firmas espectrales y comportamiento radiométrico</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="taller8--1-.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Taller 8 - Fundamentos GEE</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>María José Duarte Hamón </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="entregables" class="level1">
+<h1>Entregables</h1>
+<p>Para este taller se adjunta en este documento:</p>
+<ul>
+<li>Los códigos utilizados para las actividades necesarias</li>
+<li>Imágenes de los mapas realizados en QGIS con la exportación de JSON</li>
+<li>Debido a inconvenientes para renderizar el documento se colocan los textos o las imágenes de los resultados</li>
+</ul>
+<p>Al repositorio se añaden los mapas interactivos realizados en HTML, para descargar y probar.</p>
+</section>
+<section id="integración-de-geoprocesos-en-plataformas-de-escritorio" class="level1">
+<h1>Integración de geoprocesos en plataformas de escritorio</h1>
+<section id="inicialización" class="level2">
+<h2 class="anchored" data-anchor-id="inicialización">Inicialización</h2>
+<div id="e17b9e8a" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ee</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>ee.Authenticate()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>True</code></pre>
+</div>
+</div>
+<div id="bc1afaf1" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ee.Initialize(project<span class="op">=</span><span class="st">"maduarteh-taller8"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Google Earth Engine se ha inicializado con éxito!"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Google Earth Engine se ha inicializado con éxito!</code></pre>
+</div>
+</div>
+<div id="2913b3ec" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. IMPORTACIÓN E INICIALIZACIÓN</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 'ee' es la librería central para interactuar con los servidores de Google.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ee</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geemap</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. VARIABLES EN EL ENTORNO CLIENTE (PYTHON NATIVO)</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Estas variables residen exclusivamente en la memoria de la computadora local.</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>ciudad_cliente <span class="op">=</span> <span class="st">'Bogotá'</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>poblacion_cliente <span class="op">=</span> <span class="dv">7181469</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>ciudades_cliente <span class="op">=</span> [<span class="st">'Bogotá'</span>, <span class="st">'Medellín'</span>, <span class="st">'Cali'</span>, <span class="st">'Barranquilla'</span>]</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>datos_ciudad_cliente <span class="op">=</span> {</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">'ciudad'</span>: <span class="st">'Bogotá'</span>,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">'coordenadas'</span>: [<span class="op">-</span><span class="fl">74.084</span>, <span class="fl">4.638</span>],</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">'poblacion'</span>: <span class="dv">7181469</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. VARIABLES EN EL ENTORNO SERVIDOR (OBJETOS EARTH ENGINE)</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Estas variables se declaran como contenedores de instrucciones para la nube.</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Los datos reales no existen en la memoria local hasta que se solicitan.</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>ciudad_servidor <span class="op">=</span> ee.String(<span class="st">'Bogotá'</span>)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>poblacion_servidor <span class="op">=</span> ee.Number(<span class="dv">7181469</span>)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>coordenadas_servidor <span class="op">=</span> ee.List([<span class="op">-</span><span class="fl">74.084</span>, <span class="fl">4.638</span>])</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>ciudades_servidor <span class="op">=</span> ee.List([<span class="st">'Bogotá'</span>, <span class="st">'Medellín'</span>, <span class="st">'Cali'</span>, <span class="st">'Barranquilla'</span>])</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>datos_ciudad_servidor <span class="op">=</span> ee.Dictionary({</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">'ciudad'</span>: ciudad_servidor,</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">'coordenadas'</span>: coordenadas_servidor,</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">'poblacion'</span>: poblacion_servidor</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternativamente:</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="co"># El constructor ee.Dictionary() de la API de Google Earth Engine es capaz</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="co"># de "envolver" (hacer casting) automáticamente tipos de datos nativos</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="co"># de Python (como strings o números) a objetos del servidor</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>datos_ciudad_servidor <span class="op">=</span> ee.Dictionary({</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    <span class="st">'ciudad'</span>: <span class="st">'Bogotá'</span>,</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">'coordenadas'</span>: [<span class="op">-</span><span class="fl">74.084</span>, <span class="fl">4.638</span>],</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    <span class="st">'poblacion'</span>: <span class="dv">7181469</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. FUNCIONES DEL SERVIDOR</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="co"># Las concatenaciones y operaciones de texto requieren métodos de la API (ej. .cat).</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Definimos la función en Python que devuelve un objeto de Earth Engine (instrucción).</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> saludar_servidor(nombre):</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ee.String(<span class="st">'Hola '</span>).cat(nombre)</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a><span class="co"># Ejecutamos la función pasándole un nombre.</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="co"># El resultado es un objeto ee.String que vive en el servidor.</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>saludo_unal <span class="op">=</span> saludar_servidor(<span class="st">'Comunidad UNAL'</span>)</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. OPERACIONES EN EL SERVIDOR</span></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="co"># Las operaciones matemáticas no utilizan operadores nativos (+, -, *, /).</span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a><span class="co"># Se deben emplear los métodos específicos de las clases de Earth Engine.</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>valor_a <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>valor_b <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>resultado_suma <span class="op">=</span> ee.Number(valor_a).add(valor_b)</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="co"># Generación de secuencias numéricas (ej. años para series de tiempo).</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a><span class="co"># La secuencia incluye el 2020!</span></span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>lista_anios <span class="op">=</span> ee.List.sequence(<span class="dv">1980</span>, <span class="dv">2020</span>, <span class="dv">5</span>)</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. TRANSFERENCIA SERVIDOR -&gt; CLIENTE (.getInfo())</span></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a><span class="co"># Para visualizar o utilizar los resultados procesados en la nube dentro del entorno local,</span></span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a><span class="co"># es estrictamente obligatorio invocar el método .getInfo().</span></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- RESULTADOS TRANSFERIDOS DESDE EL SERVIDOR ---"</span>)</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Saludo del servidor:"</span>, saludo_unal.getInfo())</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Ciudad:"</span>, ciudad_servidor.getInfo())</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Resultado suma:"</span>, resultado_suma.getInfo())</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Secuencia de años:"</span>, lista_anios.getInfo())</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Datos de la ciudad:"</span>, datos_ciudad_servidor.getInfo())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>— RESULTADOS TRANSFERIDOS DESDE EL SERVIDOR — Saludo del servidor: Hola Comunidad UNAL Ciudad: Bogotá Resultado suma: 3 Secuencia de años: [1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020] Datos de la ciudad: {‘ciudad’: ‘Bogotá’, ‘coordenadas’: [-74.084, 4.638], ‘poblacion’: 7181469}</p>
+</div>
+</div>
+</section>
+<section id="geoprocesos-seleccionados" class="level2">
+<h2 class="anchored" data-anchor-id="geoprocesos-seleccionados">Geoprocesos seleccionados</h2>
+<ul>
+<li><p><strong>Reducción Estadística Temporal:</strong> Utilizando la colección de Sentinel-2 para crear una imagen sintética limpia de nubes mediante el cálculo de la mediana de los píxeles.</p></li>
+<li><p><strong>Álgebra de Bandas (Cálculo del Índice de Vegetación NDVI):</strong> Aplicando la diferencia normalizada sobre las bandas del Infrarrojo Cercano (NIR) y Rojo de una imagen Sentinel-2.</p></li>
+</ul>
+<section id="mosaico-mediano-temporal" class="level3">
+<h3 class="anchored" data-anchor-id="mosaico-mediano-temporal">Mosaico Mediano Temporal</h3>
+<p>Este bloque filtra la colección armonizada de Sentinel-2 sobre un punto de interés (en este ejemplo, el Eje Cafetero), calcula la mediana para remover nubes y exporta el grafo computacional serializado en formato JSON.</p>
+<div id="geoproceso-mosaico-mediano" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Geoproceso 1 - Mosaico Mediano Temporal (Sentinel-2)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ee</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Asegurar que exista la carpeta 'data' en el directorio local</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">'data'</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Definición de un punto de interés geográfico (Eje Cafetero / Pereira)</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>punto_eje <span class="op">=</span> ee.Geometry.Point([<span class="op">-</span><span class="fl">75.696</span>, <span class="fl">4.813</span>])</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Consulta y filtrado espacial, temporal y de calidad (nubosidad &lt; 15%)</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>coleccion_s2 <span class="op">=</span> (ee.ImageCollection(<span class="st">"COPERNICUS/S2_SR_HARMONIZED"</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>                .filterBounds(punto_eje)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                .filterDate(<span class="st">'2024-01-01'</span>, <span class="st">'2024-12-31'</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>                .<span class="bu">filter</span>(ee.Filter.lt(<span class="st">'CLOUDY_PIXEL_PERCENTAGE'</span>, <span class="dv">15</span>)))</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Aplicación de la reducción estadística temporal por mediana</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>mosaico_mediano <span class="op">=</span> coleccion_s2.median()</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Seleccionamos las bandas de Color Verdadero (R=B4, G=B3, B=B2) para la visualización en SIG</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>mosaico_rgb <span class="op">=</span> mosaico_mediano.select([<span class="st">'B4'</span>, <span class="st">'B3'</span>, <span class="st">'B2'</span>])</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Serialización del objeto estructurado y exportación a JSON</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>mosaico_serializado <span class="op">=</span> mosaico_rgb.serialize()</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'data/geoproceso1_mosaico_serializado.json'</span>, <span class="st">'w'</span>) <span class="im">as</span> archivo:</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    json.dump(mosaico_serializado, archivo)</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Geoproceso 1 completado. Archivo guardado en 'data/geoproceso1_mosaico_serializado.json'"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Geoproceso 1 completado. Archivo guardado en ‘data/geoproceso1_mosaico_serializado.json’</p>
+</div>
+</div>
+</section>
+<section id="álgebra-de-bandas" class="level3">
+<h3 class="anchored" data-anchor-id="álgebra-de-bandas">Álgebra de bandas</h3>
+<p>Este bloque selecciona una imagen individual limpia de Sentinel-2 en el Valle del Cauca, ejecuta la operación matemática del índice NDVI empleando el método <code>.normalizedDifference()</code> y exporta el resultado serializado.</p>
+<div id="geoproceso-calculo-ndvi" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Geoproceso 2 - Álgebra de Bandas (Cálculo de NDVI)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ee</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Definición de un punto de interés geográfico (Zarzal, Valle del Cauca)</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>punto_valle <span class="op">=</span> ee.Geometry.Point([<span class="op">-</span><span class="fl">76.052</span>, <span class="fl">4.398</span>])</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Selección de una imagen individual con baja presencia de nubes</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>img_s2 <span class="op">=</span> (ee.ImageCollection(<span class="st">"COPERNICUS/S2_SR_HARMONIZED"</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>          .filterBounds(punto_valle)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>          .filterDate(<span class="st">'2023-01-01'</span>, <span class="st">'2023-12-31'</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>          .<span class="bu">filter</span>(ee.Filter.lt(<span class="st">'CLOUDY_PIXEL_PERCENTAGE'</span>, <span class="dv">10</span>))</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>          .first())</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Álgebra de bandas: Cálculo del NDVI utilizando las bandas B8 (NIR) y B4 (Rojo)</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Fórmula automatizada por GEE: (B8 - B4) / (B8 + B4)</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>ndvi <span class="op">=</span> img_s2.normalizedDifference([<span class="st">'B8'</span>, <span class="st">'B4'</span>]).rename(<span class="st">'NDVI'</span>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Serialización del objeto de índice de vegetación y exportación a JSON</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>ndvi_serializado <span class="op">=</span> ndvi.serialize()</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'data/geoproceso2_ndvi_serializado.json'</span>, <span class="st">'w'</span>) <span class="im">as</span> archivo:</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    json.dump(ndvi_serializado, archivo)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Geoproceso 2 completado. Archivo guardado en 'data/geoproceso2_ndvi_serializado.json'"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Geoproceso 2 completado. Archivo guardado en ‘data/geoproceso2_ndvi_serializado.json’</p>
+</div>
+</div>
+</section>
+<section id="mapas-estáticos-de-los-geoprocesos-realizados" class="level3">
+<h3 class="anchored" data-anchor-id="mapas-estáticos-de-los-geoprocesos-realizados">Mapas estáticos de los geoprocesos realizados</h3>
+<div id="fig-mapa-mosaico" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-message="false" data-execution_count="6">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mapa-mosaico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> io <span class="im">import</span> BytesIO</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Definir un área de cobertura (Buffer de 25 km) alrededor del punto del Eje Cafetero</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>roi_mosaico <span class="op">=</span> punto_eje.<span class="bu">buffer</span>(<span class="dv">25000</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Convertir los datos numéricos a formato RGB visible (Escala típica S2 SR: 0 a 3000)</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>mosaico_vis <span class="op">=</span> mosaico_rgb.visualize(<span class="bu">min</span><span class="op">=</span><span class="dv">0</span>, <span class="bu">max</span><span class="op">=</span><span class="dv">3000</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Solicitar la URL de la miniatura al servidor de Google Earth Engine</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>url_mosaico <span class="op">=</span> mosaico_vis.getThumbURL({</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">'dimensions'</span>: <span class="dv">800</span>,  <span class="co"># Resolución en píxeles</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">'region'</span>: roi_mosaico,</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">'format'</span>: <span class="st">'png'</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Descargar la imagen temporalmente a la memoria local</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>respuesta_m <span class="op">=</span> requests.get(url_mosaico)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>img_mosaico <span class="op">=</span> Image.<span class="bu">open</span>(BytesIO(respuesta_m.content))</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Obtener coordenadas geográficas reales para el encuadre (Bounding Box)</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>coords_m <span class="op">=</span> roi_mosaico.bounds().getInfo()[<span class="st">'coordinates'</span>][<span class="dv">0</span>]</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>xmin_m, ymin_m <span class="op">=</span> coords_m[<span class="dv">0</span>][<span class="dv">0</span>], coords_m[<span class="dv">0</span>][<span class="dv">1</span>]</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>xmax_m, ymax_m <span class="op">=</span> coords_m[<span class="dv">2</span>][<span class="dv">0</span>], coords_m[<span class="dv">2</span>][<span class="dv">1</span>]</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Dibujar el mapa estático con Matplotlib</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">7</span>))</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>ax.imshow(img_mosaico, extent<span class="op">=</span>[xmin_m, xmax_m, ymin_m, ymax_m])</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Estética cartográfica básica</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>ax.grid(color<span class="op">=</span><span class="st">'white'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, linewidth<span class="op">=</span><span class="fl">0.5</span>, alpha<span class="op">=</span><span class="fl">0.6</span>)</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Mosaico Mediano Temporal - Sentinel-2'</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>)</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Longitud (Grados Decimales)'</span>)</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Latitud (Grados Decimales)'</span>)</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-mapa-mosaico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1
+</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="mosaico.png" class="img-fluid figure-img"></p>
+<figcaption>Mosaico Mediano Temporal - Sentinel</figcaption>
+</figure>
+</div>
+<div id="fig-mapa-ndvi" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-message="false" data-execution_count="7">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mapa-ndvi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Definir un área de cobertura (Buffer de 20 km) alrededor del punto del Valle</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>roi_ndvi <span class="op">=</span> punto_valle.<span class="bu">buffer</span>(<span class="dv">20000</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Definir paleta de colores para el NDVI (Suelo desnudo a vegetación densa)</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>paleta_ndvi <span class="op">=</span> [<span class="st">'#FFFFFF'</span>, <span class="st">'#CE7E3B'</span>, <span class="st">'#E6A20B'</span>, <span class="st">'#E5D60B'</span>, <span class="st">'#AADE0B'</span>, <span class="st">'#32CD32'</span>, <span class="st">'#006400'</span>]</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Convertir el mapa de NDVI a RGB usando la paleta y rangos</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>ndvi_vis <span class="op">=</span> ndvi.visualize(<span class="bu">min</span><span class="op">=</span><span class="fl">0.0</span>, <span class="bu">max</span><span class="op">=</span><span class="fl">0.8</span>, palette<span class="op">=</span>paleta_ndvi)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Solicitar la URL de la miniatura a GEE</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>url_ndvi <span class="op">=</span> ndvi_vis.getThumbURL({</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'dimensions'</span>: <span class="dv">800</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">'region'</span>: roi_ndvi,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">'format'</span>: <span class="st">'png'</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Descargar la imagen en la memoria</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>respuesta_n <span class="op">=</span> requests.get(url_ndvi)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>img_ndvi <span class="op">=</span> Image.<span class="bu">open</span>(BytesIO(respuesta_n.content))</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Obtener coordenadas geográficas para el encuadre</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>coords_n <span class="op">=</span> roi_ndvi.bounds().getInfo()[<span class="st">'coordinates'</span>][<span class="dv">0</span>]</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>xmin_n, ymin_n <span class="op">=</span> coords_n[<span class="dv">0</span>][<span class="dv">0</span>], coords_n[<span class="dv">0</span>][<span class="dv">1</span>]</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>xmax_n, ymax_n <span class="op">=</span> coords_n[<span class="dv">2</span>][<span class="dv">0</span>], coords_n[<span class="dv">2</span>][<span class="dv">1</span>]</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. Dibujar el mapa estático con Matplotlib</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">7</span>))</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>ax.imshow(img_ndvi, extent<span class="op">=</span>[xmin_n, xmax_n, ymin_n, ymax_n])</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Estética cartográfica básica</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>ax.grid(color<span class="op">=</span><span class="st">'black'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, linewidth<span class="op">=</span><span class="fl">0.5</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Índice de Vegetación (NDVI) - Sentinel-2'</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>)</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Longitud (Grados Decimales)'</span>)</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Latitud (Grados Decimales)'</span>)</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-mapa-ndvi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2
+</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="NDVI.png" class="img-fluid figure-img"></p>
+<figcaption>NDVI - Sentinel 2</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="imágenes-de-las-composiciones-realizadas" class="level2">
+<h2 class="anchored" data-anchor-id="imágenes-de-las-composiciones-realizadas">Imágenes de las composiciones realizadas</h2>
+<p>Se importaron estas imágenes a ARCGIS con el objetivo de elaborar mapas a partir de estos. Sin embargo, no fue posible realizar la instalación de la librería de GEE en arcgis por lo que se exporta el mapa TIFF para realizar el ejercicio</p>
+<p><strong>Mosaico</strong></p>
+<div id="2629b375" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>roi_descarga_1 <span class="op">=</span> punto_eje.<span class="bu">buffer</span>(<span class="dv">12000</span>)  <span class="co"># antes 25000, ahora 12 km de radio</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>url_descarga_1 <span class="op">=</span> mosaico_rgb.getDownloadURL({</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'scale'</span>: <span class="dv">30</span>,  <span class="co"># antes 10, ahora 30 metros por píxel</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'region'</span>: roi_descarga_1,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'format'</span>: <span class="st">'GEO_TIFF'</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>respuesta_1 <span class="op">=</span> requests.get(url_descarga_1)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'data/geoproceso1_mosaico.tif'</span>, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    f.write(respuesta_1.content)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"GeoTIFF del geoproceso 1 descargado correctamente"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="c3820ae9" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>roi_descarga_2 <span class="op">=</span> punto_valle.<span class="bu">buffer</span>(<span class="dv">10000</span>)  <span class="co"># antes 20000, ahora 10 km de radio</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>url_descarga_2 <span class="op">=</span> ndvi.getDownloadURL({</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'scale'</span>: <span class="dv">20</span>,  <span class="co"># antes 10, ahora 20 metros por píxel</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'region'</span>: roi_descarga_2,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'format'</span>: <span class="st">'GEO_TIFF'</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>respuesta_2 <span class="op">=</span> requests.get(url_descarga_2)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'data/geoproceso2_ndvi.tif'</span>, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    f.write(respuesta_2.content)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"GeoTIFF del geoproceso 2 descargado correctamente"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Confirmamos el sistema de coordenadas que tienen las imágenes para hacer el mapa</p>
+<div id="8fc0521d" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rasterio</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> rasterio.<span class="bu">open</span>(<span class="st">'data/geoproceso1_mosaico.tif'</span>) <span class="im">as</span> src:</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"CRS del geoproceso 1:"</span>, src.crs)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> rasterio.<span class="bu">open</span>(<span class="st">'data/geoproceso2_ndvi.tif'</span>) <span class="im">as</span> src:</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"CRS del geoproceso 2:"</span>, src.crs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>CRS del geoproceso 1: EPSG:4326 CRS del geoproceso 2: EPSG:32618</p>
+</div>
+</div>
+<p>IMAGENES DE LOS MAPAS <img src="mosaico.jpg" class="img-fluid" alt="Mosaico"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="NDVI.jpg" class="img-fluid figure-img"></p>
+<figcaption>NDVI</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="reto-programación-espacial-avanzada" class="level1">
+<h1>Reto programación espacial avanzada</h1>
+<section id="análisis-multiespectral-extendido" class="level2">
+<h2 class="anchored" data-anchor-id="análisis-multiespectral-extendido">Análisis multiespectral extendido</h2>
+<p>Se construye un mapa interactivo que integra cuatro composiciones espectrales derivadas de un único mosaico mediano de Sentinel-2 sobre el Eje Cafetero: color natural, falso color infrarrojo, NDVI y NDWI, cada una como una capa independiente controlable desde Folium.</p>
+<div id="feadde00" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ee</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Punto de interés: Eje Cafetero (Pereira)</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>punto_eje <span class="op">=</span> ee.Geometry.Point([<span class="op">-</span><span class="fl">75.696</span>, <span class="fl">4.813</span>])</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Colección Sentinel-2 filtrada por espacio, tiempo y nubosidad</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>coleccion_s2 <span class="op">=</span> (ee.ImageCollection(<span class="st">"COPERNICUS/S2_SR_HARMONIZED"</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>                .filterBounds(punto_eje)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>                .filterDate(<span class="st">'2024-01-01'</span>, <span class="st">'2024-12-31'</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>                .<span class="bu">filter</span>(ee.Filter.lt(<span class="st">'CLOUDY_PIXEL_PERCENTAGE'</span>, <span class="dv">15</span>)))</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Mosaico mediano (imagen compuesta libre de nubes)</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>mosaico <span class="op">=</span> coleccion_s2.median()</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Bandas disponibles:"</span>, mosaico.bandNames().getInfo())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="86ac0c19" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># NDVI = (NIR - Rojo) / (NIR + Rojo)  -&gt;  detecta vegetación sana</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>ndvi_reto <span class="op">=</span> mosaico.normalizedDifference([<span class="st">'B8'</span>, <span class="st">'B4'</span>]).rename(<span class="st">'NDVI'</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># NDWI = (Verde - NIR) / (Verde + NIR)  -&gt;  detecta agua/humedad</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>ndwi_reto <span class="op">=</span> mosaico.normalizedDifference([<span class="st">'B3'</span>, <span class="st">'B8'</span>]).rename(<span class="st">'NDWI'</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"NDVI y NDWI calculados correctamente"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="e6982586" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Color natural (RGB verdadero)</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>vis_natural <span class="op">=</span> {<span class="st">'bands'</span>: [<span class="st">'B4'</span>, <span class="st">'B3'</span>, <span class="st">'B2'</span>], <span class="st">'min'</span>: <span class="dv">0</span>, <span class="st">'max'</span>: <span class="dv">3000</span>}</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Falso color infrarrojo (para contexto, opcional)</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>vis_falso_color <span class="op">=</span> {<span class="st">'bands'</span>: [<span class="st">'B8'</span>, <span class="st">'B4'</span>, <span class="st">'B3'</span>], <span class="st">'min'</span>: <span class="dv">0</span>, <span class="st">'max'</span>: <span class="dv">3000</span>}</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># NDVI: paleta de rojo (poca vegetación) a verde (mucha vegetación)</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>vis_ndvi <span class="op">=</span> {</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'min'</span>: <span class="op">-</span><span class="fl">0.2</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'max'</span>: <span class="fl">0.8</span>,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'palette'</span>: [<span class="st">'red'</span>, <span class="st">'orange'</span>, <span class="st">'yellow'</span>, <span class="st">'lightgreen'</span>, <span class="st">'darkgreen'</span>]</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co"># NDWI: paleta de café (seco) a azul (agua)</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>vis_ndwi <span class="op">=</span> {</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">'min'</span>: <span class="op">-</span><span class="fl">0.5</span>,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">'max'</span>: <span class="fl">0.5</span>,</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">'palette'</span>: [<span class="st">'brown'</span>, <span class="st">'white'</span>, <span class="st">'blue'</span>]</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="c7182e3a" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>id_natural <span class="op">=</span> mosaico.getMapId(vis_natural)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>id_falso_color <span class="op">=</span> mosaico.getMapId(vis_falso_color)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>id_ndvi <span class="op">=</span> ndvi_reto.getMapId(vis_ndvi)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>id_ndwi <span class="op">=</span> ndwi_reto.getMapId(vis_ndwi)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"IDs de mapa generados para las 4 capas"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="a87528ef" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> folium</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">'mapas'</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Mapa base centrado en el Eje Cafetero</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>Map_multiespectral <span class="op">=</span> folium.Map(location<span class="op">=</span>[<span class="fl">4.813</span>, <span class="op">-</span><span class="fl">75.696</span>], zoom_start<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Capa 1: Color natural (encendida por defecto)</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>folium.TileLayer(</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    tiles<span class="op">=</span>id_natural[<span class="st">'tile_fetcher'</span>].url_format,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    attr<span class="op">=</span><span class="st">'Google Earth Engine'</span>,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    overlay<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">'1. Color Natural (RGB)'</span>,</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    show<span class="op">=</span><span class="va">True</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>).add_to(Map_multiespectral)</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Capa 2: Falso color infrarrojo (apagada por defecto)</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>folium.TileLayer(</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>    tiles<span class="op">=</span>id_falso_color[<span class="st">'tile_fetcher'</span>].url_format,</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    attr<span class="op">=</span><span class="st">'Google Earth Engine'</span>,</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>    overlay<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">'2. Falso Color Infrarrojo'</span>,</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>    show<span class="op">=</span><span class="va">False</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>).add_to(Map_multiespectral)</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Capa 3: NDVI (apagada por defecto)</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>folium.TileLayer(</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>    tiles<span class="op">=</span>id_ndvi[<span class="st">'tile_fetcher'</span>].url_format,</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>    attr<span class="op">=</span><span class="st">'Google Earth Engine'</span>,</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>    overlay<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">'3. NDVI (Vegetación)'</span>,</span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>    show<span class="op">=</span><span class="va">False</span></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>).add_to(Map_multiespectral)</span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Capa 4: NDWI (apagada por defecto)</span></span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>folium.TileLayer(</span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>    tiles<span class="op">=</span>id_ndwi[<span class="st">'tile_fetcher'</span>].url_format,</span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>    attr<span class="op">=</span><span class="st">'Google Earth Engine'</span>,</span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a>    overlay<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">'4. NDWI (Agua/Humedad)'</span>,</span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a>    show<span class="op">=</span><span class="va">False</span></span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a>).add_to(Map_multiespectral)</span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Control de capas: permite prender/apagar cada una desde el mapa</span></span>
+<span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a>folium.LayerControl(collapsed<span class="op">=</span><span class="va">False</span>).add_to(Map_multiespectral)</span>
+<span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a><span class="co"># Guardar el mapa como HTML independiente (queda disponible en el repositorio)</span></span>
+<span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a>Map_multiespectral.save(<span class="st">"mapas/map_multiespectral.html"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>El mapa interactivo con las cuatro capas (color natural, falso color infrarrojo, NDVI y NDWI) se genera y se guarda como archivo HTML independiente en <code>mapas/map_multiespectral.html</code>. No se coloca interactivo dentro de este documento, para garantizar una renderización estable tanto en HTML como en PDF. El archivo se encuentra adjunto en el repositorio de GitHub del taller y puede abrirse directamente en cualquier navegador:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="mapa%20multiespectral.png" class="img-fluid figure-img"></p>
+<figcaption>Mapa Multiespectral</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="preguntas-finales" class="level1">
+<h1>Preguntas Finales</h1>
+<section id="arquitectura-cliente-servidor" class="level2">
+<h2 class="anchored" data-anchor-id="arquitectura-cliente-servidor">Arquitectura cliente-servidor</h2>
+<p>La API de Google Earth Engine (GEE) opera bajo una arquitectura distribuida donde existen dos entornos independientes. El cliente corresponde a la máquina local y sus variables de Python, las cuales se ejecutan de forma inmediata. Por el contrario, el servidor abarca la infraestructura en la nube de Google que almacena y procesa datos satelitales. Los objetos como <code>ee.Image</code> o <code>ee.Number</code> no contienen datos reales locales, estos funcionan como nodos de un grafo de instrucciones. Debido a esto, las operaciones matemáticas nativas de Python son incompatibles con la API, requiriendo métodos específicos, como <code>.add()</code> o <code>.select()</code>, para estructurar los procesos que los servidores de Google ejecutarán en paralelo sin sobrecargar el computador.</p>
+<p>Para comunicar ambos entornos, el método <code>.getInfo()</code> cumple la función de forzar la evaluación asíncrona del grafo en el servidor para descargar un resultado numérico o de metadatos simplificado hacia la memoria RAM local. No obstante, al procesar volúmenes masivos sobre regiones extensas como el territorio colombiano, la transferencia de imágenes completas a través de este método saturaría el canal de respuesta; por ello, para la visualización fluida o el almacenamiento de datos a gran escala, se delega el flujo de trabajo a herramientas optimizadas de despliegue interactivo o rutinas asíncronas de exportación en lote.</p>
+</section>
+<section id="firmas-espectrales-y-comportamiento-radiométrico" class="level2">
+<h2 class="anchored" data-anchor-id="firmas-espectrales-y-comportamiento-radiométrico">Firmas espectrales y comportamiento radiométrico</h2>
+<p>La resolución espectral determina la capacidad de un sensor para discriminar coberturas terrestres que son visualmente parecidas pero muestran comportamientos radiométricos opuestos en regiones invisibles al ojo humano. Esta divergencia se muestra al contrastar un cuerpo de agua, como el Embalse de Tominé, con un bosque altoandino en la región del infrarrojo cercano. Mientras que la vegetación sana dispersa la energía generando picos de reflectancia que superan el 40%, el agua absorbe casi la totalidad de los fotones, reduciendo su reflectancia a niveles cercanos a cero. Esta diferencia constituye el fundamento físico y matemático para el cálculo de índices de vegetación.</p>
+<p>En el infrarrojo de onda corta (SWIR), la vegetación experimenta un descenso moderado debido a su contenido de humedad foliar, mientras que el agua mantiene la absorción y una curva cercana a cero. Por esto, el bosque altoandino dibuja una curva con un pico marcado en el NIR y un descenso pequeño en el SWIR, en contraste con la trayectoria lineal y de baja reflectancia del embalse al ser un cuerpo hídrico. Esta diferencia en el patrón espectral permite a los algoritmos de clasificación asignar etiquetas de cobertura a cada píxel.</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
